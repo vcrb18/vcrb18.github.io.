@@ -1,0 +1,51 @@
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simulación de phishing</title>
+  <style>
+    body { font-family: Inter, system-ui, -apple-system, "Helvetica Neue", Arial;
+           background:#f9fafb; color:#111; padding:24px; text-align:center; }
+    .card { background:white; max-width:700px; margin:40px auto; padding:32px;
+            border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.08); }
+    h1 { font-size:28px; color:#b91c1c; margin-bottom:16px; }
+    h2 { font-size:20px; color:#111827; margin-bottom:24px; }
+    p { font-size:16px; line-height:1.5; margin: 12px 0; }
+    .ok { font-size:18px; font-weight:600; color:#059669; margin-top:20px; }
+  </style>
+
+  <!-- PostHog SDK -->
+  <script src="https://cdn.posthog.com/posthog.js"></script>
+  <script>
+    const POSTHOG_TOKEN = 'phc_STsjKrrJmCWjFEeISwqJAOM5gsAvikLs20xTkaKV8s2';
+    const POSTHOG_HOST  = 'https://us.i.posthog.com';
+
+    posthog.init(POSTHOG_TOKEN, {
+      api_host: POSTHOG_HOST,
+      capture_pageview: true,
+    });
+
+    // Captura de evento al cargar la página
+    document.addEventListener("DOMContentLoaded", function() {
+      posthog.capture('phishing_simulation_view', {
+        simulation: 'phishing_test_sept2025',
+        message: 'Usuario abrió la página de la simulación de phishing'
+      });
+    });
+  </script>
+</head>
+<body>
+  <div class="card">
+    <h1>⚠️ ¡CAISTE EN UNA TRAMPA DE PHISHING!</h1>
+    <h2>Tranquilo: esto es solo una simulación</h2>
+    <p><strong>Soy Vinni Cruz</strong> y estoy haciendo una simulación de phishing
+       autorizada como parte de las pruebas para ISO 27001:2022 y SOC 2.</p>
+    <p>No está pasando nada grave, no hay ningún riesgo real para tu cuenta ni para la empresa.</p>
+    <p>El objetivo de esta prueba es entrenar y concientizar al equipo sobre
+       cómo detectar este tipo de ataques y mejorar nuestra seguridad.</p>
+    <p class="ok">✅ Gracias por participar — seguimos mejorando juntos la seguridad de Vambe.</p>
+  </div>
+</body>
+</html>
