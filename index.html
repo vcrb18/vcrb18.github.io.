@@ -41,6 +41,8 @@
     document.addEventListener("DOMContentLoaded", function() {
       const victim = getQueryParam("victim");
 
+      console.log("Victim", victim)
+
        // Si vino en la URL, lo usamos como identificador de la persona
       if (victim) {
         posthog.identify(victim); // esto crea el perfil de persona con el correo
