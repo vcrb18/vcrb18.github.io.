@@ -40,6 +40,11 @@
     // Captura de evento al cargar la página
     document.addEventListener("DOMContentLoaded", function() {
       const victim = getQueryParam("victim");
+
+       // Si vino en la URL, lo usamos como identificador de la persona
+      if (victim) {
+        posthog.identify(victim); // esto crea el perfil de persona con el correo
+      }
       
       posthog.capture('phishing_simulation_view', {
         simulation: 'phishing_test_sept2025',
