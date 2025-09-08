@@ -24,6 +24,11 @@
     })
 </script>
   <script>
+    function getQueryParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(name);
+  }
+
     const POSTHOG_TOKEN = 'phc_STsjKrrJmCWjFEeISwqJAOM5gsAvikLs20xTkaKV8s2';
     const POSTHOG_HOST  = 'https://us.i.posthog.com';
 
@@ -34,9 +39,12 @@
 
     // Captura de evento al cargar la página
     document.addEventListener("DOMContentLoaded", function() {
+      const victim = getQueryParam("victim");
+      
       posthog.capture('phishing_simulation_view', {
         simulation: 'phishing_test_sept2025',
-        message: 'Usuario abrió la página de la simulación de phishing'
+        message: 'Usuario abrió la página de la simulación de phishing',
+        victim: victim || "unknown"
       });
     });
   </script>
