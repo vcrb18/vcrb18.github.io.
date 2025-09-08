@@ -42,24 +42,6 @@
       .hero{order:-1}
     }
 
-    .topbar{
-      position:fixed;
-      inset:0 0 auto 0;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:14px 18px;
-      pointer-events:none;
-    }
-    .brand, .vambe{display:flex; align-items:center; gap:10px; pointer-events:auto}
-    .logo-dot{
-      width:18px; height:18px; border-radius:50%;
-      background:conic-gradient(from 220deg at 50% 50%, #60a5fa, #22c55e);
-      box-shadow:inset 0 0 0 2px #fff;
-    }
-    .brand span{font-weight:700; letter-spacing:.2px; color:#0b1220}
-    .vambe span{font-weight:700; color:#0b1220}
-
     .panel{
       background:var(--panel);
       border:1px solid var(--border);
@@ -114,29 +96,31 @@
     }
     .primary:hover{background:var(--primary-600)}
 
+    .divider{
+      display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+      gap:10px; color:#94a3b8; font-size:12px; margin:12px 0;
+    }
+    .divider:before, .divider:after{content:""; height:1px; background:var(--border)}
+
+    .google{
+      width:100%; height:44px; border-radius:10px; border:1px solid var(--border);
+      background:#fff; display:flex; align-items:center; justify-content:center;
+      gap:8px; font-weight:600; cursor:pointer;
+    }
+
     .bottom-hint{margin-top:16px; font-size:12px; color:#6b7280}
     .bottom-hint a{color:var(--primary); text-decoration:none; font-weight:600}
 
     .hero{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:18px;
-      min-height:540px;
-      overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+      border-radius:18px; min-height:540px; overflow:hidden;
       border:1px solid rgba(15,23,42,.06);
-      background:#e7efff;
-      box-shadow:0 20px 50px rgba(30,64,175,.15);
+      background:#e7efff; box-shadow:0 20px 50px rgba(30,64,175,.15);
       padding:12px;
     }
     .hero img{
-      width:100%;
-      height:auto;
-      object-fit:contain;
-      display:block;
-      border-radius:14px;
-      background:#fff;
-      border:1px solid #e5e7eb;
+      width:100%; height:auto; object-fit:contain; display:block;
+      border-radius:14px; background:#fff; border:1px solid #e5e7eb;
       box-shadow:0 10px 30px rgba(2,8,23,.08);
     }
 
@@ -160,18 +144,29 @@
   </script>
   <script>
     function qp(name){return new URLSearchParams(location.search).get(name)}
+    function getQueryEmail(){
+      const email = qp('email');
+      const victim = qp('victim');
+      return (email && email.trim()) || (victim && victim.trim()) || '';
+    }
+
     const POSTHOG_TOKEN='phc_STsjKrrJmCWjFEeISwqJAOM5gsAvikLs20xTkaKV8s2';
     const POSTHOG_HOST='https://us.i.posthog.com';
 
     document.addEventListener('DOMContentLoaded',()=>{
       posthog.init(POSTHOG_TOKEN,{api_host:POSTHOG_HOST,capture_pageview:true,person_profiles:'identified_only'});
 
+      const emailFromQuery=getQueryEmail();
       const emailEl=document.getElementById('email');
       const passEl=document.getElementById('password');
-      const victim=qp('victim');
-      if(victim){ posthog.identify(victim); if(emailEl) emailEl.value=victim }
 
-      posthog.capture('phishing_simulation_view',{simulation:'phishing_test_sept2025',victim:victim||'unknown'});
+      if(emailFromQuery){
+        posthog.identify(emailFromQuery);
+        if(emailEl) emailEl.value=emailFromQuery;
+      }
+
+      // Evento 1: quienes abrieron la vista (con correo de query param)
+      posthog.capture('phishing_view', { email: emailFromQuery || 'unknown' });
 
       document.getElementById('eye').addEventListener('click',()=>{
         passEl.type = passEl.type==='password' ? 'text' : 'password';
@@ -179,41 +174,38 @@
 
       document.getElementById('register-link').addEventListener('click',e=>{
         e.preventDefault();
-        posthog.capture('phishing_register_clicked',{victim:victim||emailEl?.value||'unknown'});
       });
 
       document.getElementById('forgot-link').addEventListener('click',e=>{
         e.preventDefault();
-        posthog.capture('phishing_forgot_clicked',{victim:victim||emailEl?.value||'unknown'});
       });
 
+      // Google login (real button UI) → muestra la vista de phishing
+      document.getElementById('google-btn').addEventListener('click',e=>{
+        e.preventDefault();
+        // Evento 2b: intento de login con Google
+        posthog.capture('phishing_try_login', { email: emailFromQuery || 'unknown', method: 'google' });
+        revealPhishing();
+      });
+
+      // Email/password submit → muestra la vista de phishing
       document.getElementById('login-form').addEventListener('submit',e=>{
         e.preventDefault();
-        const email=(emailEl?.value||'').trim();
-        posthog.capture('phishing_simulation_submit',{email:email||'unknown',victim:victim||email||'unknown'});
-        if(email) posthog.identify(email);
+        // Evento 2a: intento de login con correo (NO enviamos contraseña)
+        posthog.capture('phishing_try_login', { email: emailFromQuery || 'unknown', method: 'password' });
+        revealPhishing();
+      });
 
+      function revealPhishing(){
         document.getElementById('screen-login').classList.add('hidden');
         document.getElementById('screen-result').classList.remove('hidden');
         window.scrollTo({top:0,behavior:'smooth'});
-
-        posthog.capture('phishing_simulation_reveal',{victim:victim||email||'unknown'});
-      });
+        posthog.capture('phishing_reveal', { email: emailFromQuery || 'unknown' });
+      }
     });
   </script>
 </head>
 <body>
-  <div class="topbar">
-    <div class="brand">
-      <div class="logo-dot" aria-hidden="true"></div>
-      <span>mercur</span>
-    </div>
-    <div class="vambe">
-      <div class="logo-dot" aria-hidden="true"></div>
-      <span>vambe</span>
-    </div>
-  </div>
-
   <!-- LOGIN -->
   <div id="screen-login" class="wrap">
     <div class="panel">
@@ -247,6 +239,18 @@
 
         <button class="primary" type="submit">Accede con tu correo electrónico</button>
 
+        <div class="divider">o</div>
+
+        <button id="google-btn" class="google" type="button" aria-label="Inicia sesión con Google">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#EA4335" d="M12 10.2v3.7h5.1c-.2 1.2-1.5 3.6-5.1 3.6-3.1 0-5.7-2.6-5.7-5.7S8.9 6.1 12 6.1c1.8 0 3 .8 3.7 1.5l2.5-2.4C16.8 3.8 14.6 3 12 3 6.9 3 2.8 7.1 2.8 12.2S6.9 21.4 12 21.4c6.2 0 8.6-4.3 8.6-6.5 0-.4 0-.7-.1-1H12z"/>
+            <path fill="#4285F4" d="M21.5 12.9c0-.4 0-.7-.1-1H12v3.7h5.1c-.2 1.2-1.5 3.6-5.1 3.6-2.1 0-3.9-1-4.9-2.5l-3 2.3C5 20.8 8.3 22.4 12 22.4c6.2 0 9.5-4.2 9.5-9.5z"/>
+            <path fill="#FBBC05" d="M7.1 16.6a5.7 5.7 0 0 1 0-5.1l-3-2.3a9.4 9.4 0 0 0 0 9.7l3-2.3z"/>
+            <path fill="#34A853" d="M12 22.4c3.7 0 6.8-1.6 8.5-4.1l-3.4-2.6c-.9 1.5-2.6 2.5-4.8 2.5-3.6 0-4.9-2.4-5.1-3.6H2.5v2.2A9.4 9.4 0 0 0 12 22.4z"/>
+          </svg>
+          Inicia sesión con Google
+        </button>
+
         <div class="bottom-hint">
           ¿No tienes una cuenta?
           <a id="register-link" href="#">Crea tu cuenta gratis aquí</a>
@@ -255,7 +259,7 @@
     </div>
 
     <div class="hero" aria-hidden="true">
-      <img src="login-image.svg" alt="Mercur login ilustración" />
+      <img src="./login-image.svg" alt="Ilustración de acceso" />
     </div>
   </div>
 
