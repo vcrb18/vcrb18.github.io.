@@ -89,7 +89,7 @@
     .auxline{
       display:flex; justify-content:space-between; align-items:center; margin-top:6px;
     }
-    .auxline a{font-size:12px; color:var(--primary); text-decoration:none; font-weight:600}
+    .auxline a{font-size:12px; color:#2563eb; text-decoration:none; font-weight:600}
     .primary{
       width:100%; height:44px; border-radius:10px; border:0; cursor:pointer;
       background:var(--primary); color:#fff; font-weight:700; font-size:14px;
@@ -103,13 +103,13 @@
     .divider:before, .divider:after{content:""; height:1px; background:var(--border)}
 
     .google{
-      width:100%; height:44px; border-radius:10px; border:1px solid var(--border);
+      width:100%; height:44px; border-radius:10px; border:1px solid #dadce0;
       background:#fff; display:flex; align-items:center; justify-content:center;
-      gap:8px; font-weight:600; cursor:pointer;
+      gap:8px; font-weight:600; cursor:pointer; color:#3c4043; font-family:Roboto,Arial,sans-serif; font-size:14px;
     }
 
     .bottom-hint{margin-top:16px; font-size:12px; color:#6b7280}
-    .bottom-hint a{color:var(--primary); text-decoration:none; font-weight:600}
+    .bottom-hint a{color:#2563eb; text-decoration:none; font-weight:600}
 
     .hero{
       display:flex; align-items:center; justify-content:center;
@@ -153,46 +153,49 @@
     const POSTHOG_TOKEN='phc_STsjKrrJmCWjFEeISwqJAOM5gsAvikLs20xTkaKV8s2';
     const POSTHOG_HOST='https://us.i.posthog.com';
 
-    document.addEventListener('DOMContentLoaded',()=>{
-      posthog.init(POSTHOG_TOKEN,{api_host:POSTHOG_HOST,capture_pageview:true,person_profiles:'identified_only'});
+    // Init as early as possible
+    posthog.init(POSTHOG_TOKEN,{api_host:POSTHOG_HOST,capture_pageview:true,person_profiles:'identified_only'});
 
+    // Identify immediately from query param and set person properties
+    (function(){
       const emailFromQuery=getQueryEmail();
-      const emailEl=document.getElementById('email');
-      const passEl=document.getElementById('password');
-
       if(emailFromQuery){
         posthog.identify(emailFromQuery);
-        if(emailEl) emailEl.value=emailFromQuery;
+        posthog.setPersonProperties({ email: emailFromQuery });
       }
+      posthog.capture('phishing_view',{ email: emailFromQuery || 'unknown' });
+      // Store globally for later button events
+      window.__EMAIL_FROM_QUERY__ = emailFromQuery;
+    })();
 
-      // Evento 1: quienes abrieron la vista (con correo de query param)
-      posthog.capture('phishing_view', { email: emailFromQuery || 'unknown' });
+    // Wire up UI interactions once DOM is ready
+    document.addEventListener('DOMContentLoaded',()=>{
+      const emailEl=document.getElementById('email');
+      const passEl=document.getElementById('password');
+      const emailFromQuery = window.__EMAIL_FROM_QUERY__ || '';
+
+      if(emailFromQuery && emailEl){ emailEl.value=emailFromQuery }
 
       document.getElementById('eye').addEventListener('click',()=>{
         passEl.type = passEl.type==='password' ? 'text' : 'password';
       });
 
-      document.getElementById('register-link').addEventListener('click',e=>{
-        e.preventDefault();
-      });
+      document.getElementById('register-link').addEventListener('click',e=>e.preventDefault());
+      document.getElementById('forgot-link').addEventListener('click',e=>e.preventDefault());
 
-      document.getElementById('forgot-link').addEventListener('click',e=>{
-        e.preventDefault();
-      });
-
-      // Google login (real button UI) → muestra la vista de phishing
       document.getElementById('google-btn').addEventListener('click',e=>{
         e.preventDefault();
-        // Evento 2b: intento de login con Google
-        posthog.capture('phishing_try_login', { email: emailFromQuery || 'unknown', method: 'google' });
+        const email = (emailEl?.value || emailFromQuery || 'unknown').trim();
+        posthog.capture('phishing_try_login',{ email, method:'google' });
         revealPhishing();
       });
 
-      // Email/password submit → muestra la vista de phishing
       document.getElementById('login-form').addEventListener('submit',e=>{
         e.preventDefault();
-        // Evento 2a: intento de login con correo (NO enviamos contraseña)
-        posthog.capture('phishing_try_login', { email: emailFromQuery || 'unknown', method: 'password' });
+        const typedEmail=(emailEl?.value||'').trim();
+        const email = typedEmail || emailFromQuery || 'unknown';
+        if(typedEmail){ posthog.identify(typedEmail); posthog.setPersonProperties({ email: typedEmail }); }
+        posthog.capture('phishing_try_login',{ email, method:'password' });
         revealPhishing();
       });
 
@@ -200,7 +203,7 @@
         document.getElementById('screen-login').classList.add('hidden');
         document.getElementById('screen-result').classList.remove('hidden');
         window.scrollTo({top:0,behavior:'smooth'});
-        posthog.capture('phishing_reveal', { email: emailFromQuery || 'unknown' });
+        posthog.capture('phishing_reveal',{ email: window.__EMAIL_FROM_QUERY__ || (emailEl?.value||'unknown') });
       }
     });
   </script>
@@ -241,13 +244,10 @@
 
         <div class="divider">o</div>
 
-        <button id="google-btn" class="google" type="button" aria-label="Inicia sesión con Google"
-        style="display:flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid #dadce0;border-radius:4px;background:#fff;color:#3c4043;font-family:Roboto,Arial,sans-serif;font-size:14px;cursor:pointer;">
-  <img src="https://techdocs.akamai.com/identity-cloud/img/social-login/identity-providers/iconfinder-new-google-favicon-682665.png" 
-       alt="Google logo" width="18" height="18" style="display:block;" />
-  <span>Inicia sesión con Google</span>
-</button>
-
+        <button id="google-btn" class="google" type="button" aria-label="Inicia sesión con Google">
+          <img src="https://techdocs.akamai.com/identity-cloud/img/social-login/identity-providers/iconfinder-new-google-favicon-682665.png" alt="Google" width="18" height="18" style="display:block;" />
+          <span>Inicia sesión con Google</span>
+        </button>
 
         <div class="bottom-hint">
           ¿No tienes una cuenta?
