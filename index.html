@@ -156,19 +156,18 @@
   // Inicializa lo antes posible
   posthog.init(POSTHOG_TOKEN,{ api_host:POSTHOG_HOST, capture_pageview:true });
 
-  // Evento 1: siempre al abrir la página
   document.addEventListener('DOMContentLoaded',function(){
     const victim=getQueryParam('victim');
 
     if(victim){ posthog.identify(victim); }
 
+    // Evento 1: siempre al abrir la página
     posthog.capture('phishing_simulation_view',{
       simulation:'phishing_test_sept2025',
       message:'Usuario abrió la página de la simulación de phishing',
       victim:victim||'unknown'
     });
 
-    // Función para el segundo evento (intento de login)
     function captureAttempt(method){
       posthog.capture('phishing_simulation_login',{
         simulation:'phishing_test_sept2025',
@@ -177,34 +176,42 @@
       });
     }
 
+    function revealPhishing(){
+      const login=document.getElementById('screen-login');
+      const result=document.getElementById('screen-result');
+      if(login && result){
+        login.classList.add('hidden');
+        result.classList.remove('hidden');
+        window.scrollTo({ top:0, behavior:'smooth' });
+        if(!result.__renderSent){
+          result.__renderSent = true;
+          posthog.capture('phishing_simulation_login', {
+            simulation:'phishing_test_sept2025',
+            victim:victim||'unknown',
+            method:'render'
+          });
+        }
+      }
+    }
+
     // Click en "Google"
     const googleBtn=document.getElementById('google-btn');
     if(googleBtn){
-      googleBtn.addEventListener('click',function(){ captureAttempt('google'); });
+      googleBtn.addEventListener('click',function(e){
+        e.preventDefault();
+        captureAttempt('google');
+        revealPhishing();
+      });
     }
 
     // Submit con correo/contraseña
     const form=document.getElementById('login-form');
     if(form){
       form.addEventListener('submit',function(e){
-        // si previenes el submit en otro código, igual capturamos
+        e.preventDefault(); // evita recarga y limpieza de inputs
         captureAttempt('password');
+        revealPhishing();
       });
-    }
-
-    // Observa cuando se muestre #screen-result (por si cambias clases dinámicamente)
-    const result=document.getElementById('screen-result');
-    if(result){
-      const markIfVisible=()=> {
-        if(!result.classList.contains('hidden') && !result.__attemptSent){
-          result.__attemptSent=true;
-          captureAttempt('render');
-        }
-      };
-      // ya visible al cargar
-      markIfVisible();
-      // cambios de clase posteriores
-      new MutationObserver(markIfVisible).observe(result,{ attributes:true, attributeFilter:['class'] });
     }
   });
 </script>
