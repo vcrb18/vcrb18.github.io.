@@ -6,217 +6,152 @@
   <title>Mercur — Iniciar sesión</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- estilos del lander original -->
+  <link rel="stylesheet" href="assets/style0.css" />
   <style>
-    :root{
-      --bg:#f5f7fb;
-      --panel:#ffffff;
-      --muted:#6b7280;
-      --text:#0f172a;
-      --border:#e5e7eb;
-      --primary:#2563eb;
-      --primary-600:#1d4ed8;
-      --ring:rgba(37,99,235,.2);
-      --shadow:0 8px 28px rgba(2,8,23,.10);
-      --radius:12px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Inter, system-ui, -apple-system, "Helvetica Neue", Arial;
-      color:var(--text);
-      background:var(--bg);
-    }
-
-    .wrap{
-      max-width:1220px;
-      margin:0 auto;
-      min-height:100dvh;
-      padding:20px;
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:28px;
-      align-items:center;
-    }
-    @media (max-width:1020px){
-      .wrap{grid-template-columns:1fr; padding:16px}
-      .hero{order:-1}
-    }
-
-    .panel{
-      background:var(--panel);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:28px;
-    }
-    .title{
-      font-size:22px;
-      font-weight:700;
-      margin:4px 0 6px;
-    }
-    .subtitle{
-      color:var(--muted);
-      font-size:13px;
-      margin-bottom:18px;
-      max-width:520px;
-    }
-    .field{display:grid; gap:6px; margin:10px 0}
-    label{font-size:13px; font-weight:600; color:#1f2937}
+    /* Ajustes mínimos para layout del login dentro del lander */
+    :root{--bg:#f5f7fb;--panel:#ffffff;--border:#e5e7eb;--primary:#2563eb;--primary-600:#1d4ed8}
+    body{font-family:Inter,system-ui,-apple-system,"Helvetica Neue",Arial;background:var(--bg)}
+    .wrap{max-width:1220px;margin:0 auto;min-height:100dvh;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}
+    @media (max-width:1020px){.wrap{grid-template-columns:1fr;padding:16px}.hero{order:-1}}
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 28px rgba(2,8,23,.10);padding:28px}
+    .title{font-size:22px;font-weight:700;margin:4px 0 6px}
+    .subtitle{color:#6b7280;font-size:13px;margin-bottom:18px;max-width:520px}
+    .field{display:grid;gap:6px;margin:10px 0}
+    label{font-size:13px;font-weight:600;color:#1f2937}
     .ctrl{position:relative}
-    input{
-      width:100%;
-      height:44px;
-      border:1px solid var(--border);
-      border-radius:10px;
-      background:#f8fafc;
-      padding:0 12px;
-      font-size:14px;
-      outline:none;
-      transition:border-color .15s, box-shadow .15s;
-    }
-    input::placeholder{color:#9ca3af}
-    input:focus{
-      background:#fff;
-      border-color:var(--primary);
-      box-shadow:0 0 0 4px var(--ring);
-    }
-    .eye{
-      position:absolute; right:10px; top:50%; transform:translateY(-50%);
-      width:24px; height:24px; border:0; background:#fff; border-radius:6px;
-      display:grid; place-items:center; cursor:pointer; color:#64748b;
-      box-shadow:0 0 0 1px var(--border) inset;
-    }
-    .auxline{
-      display:flex; justify-content:space-between; align-items:center; margin-top:6px;
-    }
-    .auxline a{font-size:12px; color:#2563eb; text-decoration:none; font-weight:600}
-    .primary{
-      width:100%; height:44px; border-radius:10px; border:0; cursor:pointer;
-      background:var(--primary); color:#fff; font-weight:700; font-size:14px;
-    }
+    input{width:100%;height:44px;border:1px solid var(--border);border-radius:10px;background:#f8fafc;padding:0 12px;font-size:14px;outline:none}
+    input:focus{background:#fff;border-color:var(--primary);box-shadow:0 0 0 4px rgba(37,99,235,.2)}
+    .eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:24px;height:24px;border:0;background:#fff;border-radius:6px;display:grid;place-items:center;cursor:pointer;color:#64748b;box-shadow:0 0 0 1px var(--border) inset}
+    .auxline{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+    .auxline a{font-size:12px;color:#2563eb;text-decoration:none;font-weight:600}
+    .primary{width:100%;height:44px;border-radius:10px;border:0;cursor:pointer;background:var(--primary);color:#fff;font-weight:700;font-size:14px}
     .primary:hover{background:var(--primary-600)}
-
-    .divider{
-      display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
-      gap:10px; color:#94a3b8; font-size:12px; margin:12px 0;
-    }
-    .divider:before, .divider:after{content:""; height:1px; background:var(--border)}
-
-    .google{
-      width:100%; height:44px; border-radius:10px; border:1px solid #dadce0;
-      background:#fff; display:flex; align-items:center; justify-content:center;
-      gap:8px; font-weight:600; cursor:pointer; color:#3c4043; font-family:Roboto,Arial,sans-serif; font-size:14px;
-    }
-
-    .bottom-hint{margin-top:16px; font-size:12px; color:#6b7280}
-    .bottom-hint a{color:#2563eb; text-decoration:none; font-weight:600}
-
-    .hero{
-      display:flex; align-items:center; justify-content:center;
-      border-radius:18px; min-height:540px; overflow:hidden;
-      border:1px solid rgba(15,23,42,.06);
-      background:#e7efff; box-shadow:0 20px 50px rgba(30,64,175,.15);
-      padding:12px;
-    }
-    .hero img{
-      width:100%; height:auto; object-fit:contain; display:block;
-      border-radius:14px; background:#fff; border:1px solid #e5e7eb;
-      box-shadow:0 10px 30px rgba(2,8,23,.08);
-    }
-
-    .result{
-      background:#fff; border:1px solid var(--border); border-radius:12px;
-      box-shadow:var(--shadow); padding:28px; max-width:760px; margin:40px auto;
-      text-align:left;
-    }
-    .result h1{color:#b91c1c; margin:0 0 12px; font-size:26px}
-    .result h2{margin:0 0 10px; font-size:18px}
-    .result h3{margin:0 0 10px; font-size:16px}
-    .result p{margin:10px 0; font-size:15px; line-height:1.6}
-    .ok{font-weight:700; color:#059669}
-
+    .divider{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;color:#94a3b8;font-size:12px;margin:12px 0}
+    .divider:before,.divider:after{content:"";height:1px;background:var(--border)}
+    .google{width:100%;height:44px;border-radius:10px;border:1px solid #dadce0;background:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;cursor:pointer;color:#3c4043;font-family:Roboto,Arial,sans-serif;font-size:14px}
+    .bottom-hint{margin-top:16px;font-size:12px;color:#6b7280}
+    .bottom-hint a{color:#2563eb;text-decoration:none;font-weight:600}
+    .hero{display:flex;align-items:center;justify-content:center;border-radius:18px;min-height:540px;overflow:hidden;border:1px solid rgba(15,23,42,.06);background:#e7efff;box-shadow:0 20px 50px rgba(30,64,175,.15);padding:12px}
+    .hero img{width:100%;height:auto;object-fit:contain;display:block;border-radius:14px;background:#fff;border:1px solid #e5e7eb;box-shadow:0 10px 30px rgba(2,8,23,.08)}
+    .result{background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 28px rgba(2,8,23,.10);padding:28px;max-width:760px;margin:40px auto;text-align:left}
+    .result h1{color:#b91c1c;margin:0 0 12px;font-size:26px}
+    .result h2{margin:0 0 10px;font-size:18px}
+    .result h3{margin:0 0 10px;font-size:16px}
+    .result p{margin:10px 0;font-size:15px;line-height:1.6}
+    .ok{font-weight:700;color:#059669}
     .hidden{display:none!important}
+    /* bloque “loader” idéntico al lander (decorativo) */
+    .lander-shell{position:fixed;inset:0;pointer-events:none;display:flex;align-items:center;justify-content:center;opacity:.08}
+    .lander-logo{position:relative;min-width:75px;min-height:50px}
+    .lander-logo .mark{position:relative;z-index:2}
+    .lander-logo .bars{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform:translateX(-100px)}
   </style>
 
   <!-- PostHog SDK loader -->
-<script>
-  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Ce js Ls Te Fs Ds capture Ye calculateEventProperties Us register register_once register_for_session unregister unregister_for_session Ws getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty Bs zs createPersonProfile Hs Ms Gs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Ns debug L qs getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-</script>
+  <script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init Ce js Ls Te Fs Ds capture Ye calculateEventProperties Us register register_once register_for_session unregister unregister_for_session Ws getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty Bs zs createPersonProfile Hs Ms Gs opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Ns debug L qs getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  </script>
 
-<!-- Tracking logic -->
-<script>
-  function getQueryParam(name){
-    const params=new URLSearchParams(window.location.search);
-    return params.get(name);
-  }
+  <!-- Tracking logic (igual que ahora) -->
+  <script>
+    function getQueryParam(name){
+      const params=new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
 
-  const POSTHOG_TOKEN='phc_STsjKrrJmCWjFEeISwqJAOM5gsAvikLs20xTkaKV8s2';
-  const POSTHOG_HOST='https://us.i.posthog.com';
+    const POSTHOG_TOKEN='phc_STsjKrrJmCWjFEeISwqJAOM5gsAvikLs20xTkaKV8s2';
+    const POSTHOG_HOST='https://us.i.posthog.com';
 
-  // Inicializa lo antes posible
-  posthog.init(POSTHOG_TOKEN,{ api_host:POSTHOG_HOST, capture_pageview:true });
-
-  document.addEventListener('DOMContentLoaded',function(){
-    const victim=getQueryParam('victim');
-
-    if(victim){ posthog.identify(victim); }
+    // Inicializa lo antes posible
+    posthog.init(POSTHOG_TOKEN,{ api_host:POSTHOG_HOST, capture_pageview:true });
 
     // Evento 1: siempre al abrir la página
-    posthog.capture('phishing_simulation_view',{
-      simulation:'phishing_test_sept2025',
-      message:'Usuario abrió la página de la simulación de phishing',
-      victim:victim||'unknown'
-    });
+    document.addEventListener('DOMContentLoaded',function(){
+      const victim=getQueryParam('victim');
 
-    function captureAttempt(method){
-      posthog.capture('phishing_simulation_login',{
+      if(victim){ posthog.identify(victim); }
+
+      posthog.capture('phishing_simulation_view',{
         simulation:'phishing_test_sept2025',
-        victim:victim||'unknown',
-        method:method||'unknown'
+        message:'Usuario abrió la página de la simulación de phishing',
+        victim:victim||'unknown'
       });
-    }
 
-    function revealPhishing(){
-      const login=document.getElementById('screen-login');
-      const result=document.getElementById('screen-result');
-      if(login && result){
-        login.classList.add('hidden');
-        result.classList.remove('hidden');
-        window.scrollTo({ top:0, behavior:'smooth' });
-        if(!result.__renderSent){
-          result.__renderSent = true;
-          posthog.capture('phishing_simulation_login', {
-            simulation:'phishing_test_sept2025',
-            victim:victim||'unknown',
-            method:'render'
-          });
+      function captureAttempt(method){
+        posthog.capture('phishing_simulation_login',{
+          simulation:'phishing_test_sept2025',
+          victim:victim||'unknown',
+          method:method||'unknown'
+        });
+      }
+
+      function revealPhishing(){
+        const login=document.getElementById('screen-login');
+        const result=document.getElementById('screen-result');
+        if(login && result){
+          login.classList.add('hidden');
+          result.classList.remove('hidden');
+          window.scrollTo({ top:0, behavior:'smooth' });
+          if(!result.__renderSent){
+            result.__renderSent=true;
+            posthog.capture('phishing_simulation_login',{simulation:'phishing_test_sept2025',victim:victim||'unknown',method:'render'});
+          }
         }
       }
-    }
 
-    // Click en "Google"
-    const googleBtn=document.getElementById('google-btn');
-    if(googleBtn){
-      googleBtn.addEventListener('click',function(e){
-        e.preventDefault();
-        captureAttempt('google');
-        revealPhishing();
-      });
-    }
+      const googleBtn=document.getElementById('google-btn');
+      if(googleBtn){
+        googleBtn.addEventListener('click',function(e){
+          e.preventDefault();
+          captureAttempt('google');
+          revealPhishing();
+        });
+      }
 
-    // Submit con correo/contraseña
-    const form=document.getElementById('login-form');
-    if(form){
-      form.addEventListener('submit',function(e){
-        e.preventDefault(); // evita recarga y limpieza de inputs
-        captureAttempt('password');
-        revealPhishing();
-      });
-    }
-  });
-</script>
+      const form=document.getElementById('login-form');
+      if(form){
+        form.addEventListener('submit',function(e){
+          e.preventDefault();
+          captureAttempt('password');
+          revealPhishing();
+        });
+      }
+
+      // Por si otro código muestra #screen-result
+      const result=document.getElementById('screen-result');
+      if(result){
+        const markIfVisible=()=> {
+          if(!result.classList.contains('hidden') && !result.__attemptSent){
+            result.__attemptSent=true;
+            captureAttempt('render');
+          }
+        };
+        markIfVisible();
+        new MutationObserver(markIfVisible).observe(result,{ attributes:true, attributeFilter:['class'] });
+      }
+    });
+  </script>
 </head>
 <body>
+  <!-- capa visual del lander original (no interactivo) -->
+  <div class="lander-shell" aria-hidden="true">
+    <div class="lander-logo">
+      <div class="mark">
+        <svg width="35" height="32" viewBox="0 0 35 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.5 0C11.6118 0 0 11.8694 0 17.8882C0 23.907 11.6118 32 17.5 32C23.3882 32 35 23.907 35 17.8882C35 11.8694 23.3932 0 17.5 0ZM17.5 26.4959C14.5534 26.4959 5.38462 20.9001 5.38462 17.8933C5.38462 14.8864 14.5584 5.50916 17.5 5.50916C20.4416 5.50916 29.6154 14.8864 29.6154 17.8933C29.6154 20.9001 20.4416 26.4959 17.5 26.4959Z" fill="#ffffff"/>
+        </svg>
+      </div>
+      <div class="bars">
+        <svg width="300" height="50" viewBox="0 0 300 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M100 49.9994V0L200 0.000629471V50L100 49.9994Z" fill="#2054F8"/>
+          <path d="M200 49.9994V0L300 0.000629471V50L200 49.9994Z" fill="#99B8FF"/>
+          <path d="M0 49.9994V0L100 0.000629471V50L0 49.9994Z" fill="#99B8FF"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
   <!-- LOGIN -->
   <div id="screen-login" class="wrap">
     <div class="panel">
@@ -227,7 +162,7 @@
         <div class="field">
           <label for="email">Correo electrónico</label>
           <div class="ctrl">
-            <input id="email" name="email" type="email" placeholder="john@acme.com" required />
+            <input id="email" name="email" type="email" placeholder="tu@empresa.com" required />
           </div>
         </div>
 
